@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>B2B Casino Intelligence Dashboard with Gemini AI (HTML5)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Kanit", sans-serif;
+        background-color: #111827; /* Dark Blue-Gray */
+        color: #e5e7eb; /* Light Gray */
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      main {
+        flex-grow: 1;
+      }
+      .card {
+        background-color: #1f2937; /* Darker card background */
+        border-radius: 0.75rem;
+        border: 1px solid #374151;
+        display: flex;
+        flex-direction: column;
+      }
+      .card-content {
+        flex-grow: 1;
+      }
+      .chart-bar {
+        height: 1.5rem;
+        border-radius: 0.375rem;
+        transition: width 0.5s ease-in-out;
+        display: flex;
+        align-items: center;
+        font-size: 0.75rem;
+        padding-left: 0.5rem;
+        color: white;
+      }
+      .ksp-card {
+        background-color: #1f2937;
+        border: 1px solid #374151;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        text-align: center;
+      }
+      .note-box {
+        background-color: #374151;
+        border-left: 4px solid #f59e0b;
+        padding: 0.75rem;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        color: #d1d5db;
+      }
+      .gemini-btn {
+        background-color: #4f46e5;
+        color: white;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.2s;
+        cursor: pointer;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .gemini-btn:hover {
+        background-color: #6366f1;
+      }
+      .gemini-btn:disabled {
+        background-color: #4b5563;
+        cursor: not-allowed;
+      }
+      .download-btn {
+        background-color: #059669;
+        color: white;
+        font-weight: 500;
+        padding: 0.6rem 1.2rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.2s;
+        cursor: pointer;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .download-btn:hover {
+        background-color: #10b981;
+      }
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.75);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        padding: 1rem;
+      }
+      .modal-content {
+        background-color: #1f2937;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        width: 100%;
+        max-width: 4xl;
+        max-height: 90vh;
+        overflow-y: auto;
+        border: 1px solid #374151;
+        color: #e5e7eb;
+      }
+      .modal-content h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: white;
+      }
+      .modal-content pre {
+        background-color: #111827;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: "Kanit", sans-serif;
+        font-size: 0.9rem;
+        line-height: 1.6;
+      }
+
+      @media print {
+        body {
+          background-color: #ffffff !important;
+          color: #000000 !important;
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+        }
+        .no-print {
+          display: none !important;
+        }
+        .card,
+        .ksp-card {
+          border: 1px solid #ccc !important;
+          box-shadow: none !important;
+          break-inside: avoid !important;
+          background-color: #ffffff !important;
+        }
+        .grid {
+          grid-template-columns: 1fr !important;
+        }
+        h1,
+        h2,
+        h3,
+        h4,
+        p,
+        li,
+        span,
+        div,
+        b,
+        strong,
+        article,
+        header,
+        footer,
+        section,
+        main {
+          color: #000000 !important;
+        }
+        .note-box {
+          background-color: #f0f0f0 !important;
+          border-left-color: #f59e0b !important;
+        }
+        .chart-bar {
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+          border: 1px solid #ddd;
+        }
+        .bg-cyan-500 {
+          background-color: #06b6d4 !important;
+        }
+        .bg-purple-500 {
+          background-color: #a855f7 !important;
+        }
+        .bg-emerald-500 {
+          background-color: #10b981 !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="p-4 md:p-8">
+    <main class="max-w-7xl mx-auto">
+      <!-- Header -->
+      <header class="mb-8">
+        <div class="flex justify-between items-start">
+          <div>
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">
+              B2B Casino Intelligence Dashboard
+            </h1>
+            <p class="text-lg text-gray-400">
+              ภาพรวมกลยุทธ์และข้อมูลเชิงลึกสำหรับธุรกิจคาสิโน B2B (Powered by
+              Gemini AI)
+            </p>
+          </div>
+          <button onclick="downloadPDF()" class="download-btn no-print">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
+            </svg>
+            <span>ดาวน์โหลดเป็น PDF</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Key Selling Points Section -->
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-white mb-4">
+          Key Selling Point
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="ksp-card border-l-4 border-cyan-400">
+            <p class="text-sm text-gray-400 mb-2">For Startups</p>
+            <p class="text-xl font-semibold text-cyan-400">
+              "All-in-One Solution"
+            </p>
+          </div>
+          <div class="ksp-card border-l-4 border-amber-400">
+            <p class="text-sm text-gray-400 mb-2">For Agents & Operators</p>
+            <p class="text-xl font-semibold text-amber-400">
+              "Premium Platform & Games"
+            </p>
+          </div>
+          <div class="ksp-card border-l-4 border-fuchsia-500">
+            <p class="text-sm text-gray-400 mb-2">For All Segments</p>
+            <p class="text-xl font-semibold text-fuchsia-500">
+              "Seamless Game Integration"
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Target Group Analysis Section -->
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-white mb-4">
+          วิเคราะห์กลุ่มเป้าหมาย (Target Group Analysis)
+        </h2>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Startup Casino Article -->
+          <article class="card">
+            <div class="p-6 card-content">
+              <h3 class="text-xl font-bold mb-4 text-cyan-400">
+                Startup Casino
+              </h3>
+              <div class="space-y-4">
+                <div>
+                  <h4 class="font-semibold text-gray-300">ลักษณะธุรกิจ</h4>
+                  <ul
+                    class="list-disc list-inside text-gray-400 mt-1 space-y-1"
+                  >
+                    <li>เพิ่งเปิดตัวในตลาด</li>
+                    <li>ไม่มีทีมเทคนิค (Dev)</li>
+                    <li>ต้องการระบบพร้อมใช้</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-300">จุดขายหลัก</h4>
+                  <ul
+                    class="list-disc list-inside text-gray-400 mt-1 space-y-1"
+                  >
+                    <li>White-label พร้อมใช้ทันที</li>
+                    <li>API ใช้ง่าย/สวย</li>
+                    <li>ไม่ต้องลงทุนดูแลเซิร์ฟเวอร์เอง</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-300">
+                    กลยุทธ์การค้นหาและคาดหวัง (เชิงลึก)
+                  </h4>
+                  <ul
+                    class="list-disc list-inside text-gray-400 mt-1 space-y-1"
+                  >
+                    <li>
+                      Performance Ads (FB/Google/Tiktok) targeting: startup,
+                      fintech, crypto, dev-less SaaS
+                    </li>
+                    <li>
+                      Cold outreach ผ่าน Social media platfrom targeting Startup
+                      Founders
+                    </li>
+                    <li>
+                      ออกบูธ / ร่วมแข่งขันในงาน Tech / Startup Expo เช่น
+                      Techsauce, Asia Tech
+                    </li>
+                    <li>
+                      Webinar แจกฟรี: "เริ่มต้น Casino Business ภายใน 30 วัน"
+                    </li>
+                  </ul>
+                </div>
+                <div class="note-box mt-2">
+                  <b>Note:</b> Cold outreach + การเข้าถึงแบบเน้น
+                  เริ่มต้นให้ลูกค้ากลุ่มนี้ก่อน เพื่อสร้างความน่าเชื่อถือ<br /><button
+                    class="gemini-btn mt-3 no-print"
+                    onclick="getAINoteInsights(this, `Expand on this strategic note for a B2B casino platform targeting startup casinos: 'Cold outreach + targeted approach for early customer acquisition to build credibility'. Suggest 3 concrete action items, including a sample email subject line and a key metric to track for this initiative. Respond in Thai.'`)"
+                  >
+                    ✨ รับคำแนะนำจาก AI
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="p-6 pt-0">
+              <button
+                class="gemini-btn w-full no-print"
+                onclick="getAIStrategy(this, `Generate 3 innovative and detailed marketing strategies for a B2B casino platform targeting 'Startup Casinos'. Profile: Recently launched, no in-house dev team, needs a ready-to-use 'All-in-One' white-label solution. Strategies should focus on low-cost, high-impact tactics to build trust and acquire early adopters. Respond in Thai.'`)"
+              >
+                ✨ สร้างกลยุทธ์การตลาด
+              </button>
+            </div>
+          </article>
+
+          <!-- Agent Article -->
+          <article class="card">
+            <div class="p-6 card-content">
+              <h3 class="text-xl font-bold mb-4 text-purple-400">
+                Agent เจ้าใหญ่
+              </h3>
+              <div class="space-y-4">
+                <div>
+                  <h4 class="font-semibold text-gray-300">ลักษณะธุรกิจ</h4>
+                  <ul
+                    class="list-disc list-inside text-gray-400 mt-1 space-y-1"
+                  >
+                    <li>มีฐานลูกค้าสายกีฬา/พนันทั่วไป</li>
+                    <li>มีรายได้มั่นคงและทีมบริการ</li>
+                    <li>มองหาระบบเกมพนัน</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-300">จุดขายหลัก</h4>
+                  <ul
+                    class="list-disc list-inside text-gray-400 mt-1 space-y-1"
+                  >
+                    <li>ระบบ Reseller / Sub-Agent</li>
+                    <li>UI/UX มืออาชีพ</li>
+                    <li>เกมหลากหลาย</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-300">
+                    กลยุทธ์การค้นหาและคาดหวัง (เชิงลึก)
+                  </h4>
+                  <ul
+                    class="list-disc list-inside text-gray-400 mt-1 space-y-1"
+                  >
+                    <li>
+                      เชิญเข้าร่วม Business Networking Event/Private Dinner
+                      สำหรับเอเจนท์ VIP
+                    </li>
+                    <li>Affiliate Marketing Program ระดับสูง</li>
+                    <li>
+                      นัดคิว "นักการตลาด Platinum Agent" พร้อม demo ส่วนตัว
+                    </li>
+                    <li>
+                      ปั้น Success Case Study จาก Agent
+                      ที่ประสบความสำเร็จแล้วมาใช้เป็น Content
+                    </li>
+                  </ul>
+                </div>
+                <div class="note-box mt-2">
+                  <b>Note:</b> N/A <br /><button
+                    class="gemini-btn mt-3 no-print"
+                    onclick="getAINoteInsights(this, 'Suggest a strategic note for engaging with high-value B2B casino agents. What is the most important thing to emphasize to them? Provide one key strategic point. Respond in Thai.')"
+                  >
+                    ✨ สร้าง Note แนะนำ
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="p-6 pt-0">
+              <button
+                class="gemini-btn w-full no-print"
+                onclick="getAIStrategy(this, `Generate 3 high-touch partnership strategies for a B2B casino platform targeting 'Large, established Agents'. Profile: Have a large base of sports/general betting customers, stable income, dedicated service teams, and are looking for new gambling game systems to offer. Key selling points for them are a robust Reseller/Sub-Agent system and a professional UI/UX. Respond in Thai.'`)"
+              >
+                ✨ สร้างกลยุทธ์พาร์ทเนอร์ชิพ
+              </button>
+            </div>
+          </article>
+
+          <!-- Operator Article -->
+          <article class="card">
+            <div class="p-6 card-content">
+              <h3 class="text-xl font-bold mb-4 text-emerald-400">
+                Operator ที่เปิดแล้ว
+              </h3>
+              <div class="space-y-4">
+                <div>
+                  <h4 class="font-semibold text-gray-300">ลักษณะธุรกิจ</h4>
+                  <ul
+                    class="list-disc list-inside text-gray-400 mt-1 space-y-1"
+                  >
+                    <li>มีเว็บพนันที่เปิดอยู่แล้ว</li>
+                    <li>ต้องการเกมเพิ่มเติม</li>
+                    <li>มีทีม Dev และ Backoffice อยู่แล้ว</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-300">จุดขายหลัก</h4>
+                  <ul
+                    class="list-disc list-inside text-gray-400 mt-1 space-y-1"
+                  >
+                    <li>Seamless API เชื่อมต่อง่าย</li>
+                    <li>เกมเยอะ รองรับหลายภาษา/หลายสกุลเงิน</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-300">
+                    กลยุทธ์การค้นหาและคาดหวัง (เชิงลึก)
+                  </h4>
+                  <ul
+                    class="list-disc list-inside text-gray-400 mt-1 space-y-1"
+                  >
+                    <li>
+                      Outbound Sales โดยใช้ทีม Tech Skill เพื่อเชื่อม API demo
+                    </li>
+                    <li>แนะนำ "Game Expansion Package" พร้อม GGR Model</li>
+                    <li>แจก Trial แบบ Freemium / API-Free 30 วัน</li>
+                    <li>แสดงกราฟเปรียบเทียบ Retention หลังจากเพิ่มเกมของเรา</li>
+                  </ul>
+                </div>
+                <div class="note-box mt-2">
+                  <b>Note:</b> N/A <br /><button
+                    class="gemini-btn mt-3 no-print"
+                    onclick="getAINoteInsights(this, 'Suggest a strategic note for upselling to existing B2B casino operators. What is the most important thing to emphasize to them? Provide one key strategic point focusing on retention. Respond in Thai.')"
+                  >
+                    ✨ สร้าง Note แนะนำ
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="p-6 pt-0">
+              <button
+                class="gemini-btn w-full no-print"
+                onclick="getAIStrategy(this, `Generate 3 upselling and retention strategies for a B2B casino platform targeting 'Existing Operators'. Profile: Already operate a casino website, have dev teams, and are looking to add more games. Their key driver is easy integration via a 'Seamless API' and a large variety of games. Focus on how to encourage them to integrate more of our games and services. Respond in Thai.'`)"
+              >
+                ✨ สร้างกลยุทธ์ Upselling
+              </button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Needs Comparison & Marketing Section -->
+      <section class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+        <article class="card p-6">
+          <h3 class="text-xl font-bold mb-6 text-white">
+            เปรียบเทียบความต้องการของแต่ละกลุ่ม
+          </h3>
+          <div class="space-y-5 text-gray-300">
+            <div class="grid grid-cols-4 items-center gap-4">
+              <span class="col-span-1">รวม White-label</span>
+              <div class="col-span-3">
+                <div class="w-full bg-gray-700 rounded-md">
+                  <div class="chart-bar bg-cyan-500" style="width: 100%">
+                    Startup Casino
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4">
+              <span class="col-span-1">ระบบ Reseller</span>
+              <div class="col-span-3">
+                <div class="w-full bg-gray-700 rounded-md">
+                  <div class="chart-bar bg-purple-500" style="width: 100%">
+                    Agent เจ้าใหญ่
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4">
+              <span class="col-span-1">UI/UX สวยงาม</span>
+              <div class="col-span-3">
+                <div class="w-full bg-gray-700 rounded-md mb-1.5">
+                  <div class="chart-bar bg-purple-500" style="width: 100%">
+                    Agent เจ้าใหญ่
+                  </div>
+                </div>
+                <div class="w-full bg-gray-700 rounded-md">
+                  <div class="chart-bar bg-cyan-500" style="width: 70%">
+                    Startup Casino
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4">
+              <span class="col-span-1">เกมหลากหลาย</span>
+              <div class="col-span-3">
+                <div class="w-full bg-gray-700 rounded-md mb-1.5">
+                  <div class="chart-bar bg-purple-500" style="width: 100%">
+                    Agent เจ้าใหญ่
+                  </div>
+                </div>
+                <div class="w-full bg-gray-700 rounded-md">
+                  <div class="chart-bar bg-emerald-500" style="width: 85%">
+                    Operator ที่เปิดแล้ว
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4">
+              <span class="col-span-1">API เสถียร</span>
+              <div class="col-span-3">
+                <div class="w-full bg-gray-700 rounded-md mb-1.5">
+                  <div class="chart-bar bg-emerald-500" style="width: 100%">
+                    Operator ที่เปิดแล้ว
+                  </div>
+                </div>
+                <div class="w-full bg-gray-700 rounded-md">
+                  <div class="chart-bar bg-cyan-500" style="width: 65%">
+                    Startup Casino
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4">
+              <span class="col-span-1">รองรับหลายภาษา</span>
+              <div class="col-span-3">
+                <div class="w-full bg-gray-700 rounded-md mb-1.5">
+                  <div class="chart-bar bg-emerald-500" style="width: 65%">
+                    Operator ที่เปิดแล้ว
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article class="card p-6">
+          <h3 class="text-xl font-bold mb-6 text-white">
+            B2B Marketing Funnel
+          </h3>
+          <div
+            class="relative flex flex-col items-center md:items-stretch md:flex-row justify-around text-center gap-4"
+          >
+            <div class="flex flex-col items-center z-10">
+              <div
+                class="bg-gray-800 border-2 border-blue-500 rounded-full w-24 h-24 flex items-center justify-center mb-3"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-12 w-12 text-blue-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
+              </div>
+              <h4 class="font-bold text-lg text-blue-400">Awareness</h4>
+              <p class="text-sm text-gray-400 max-w-xs">
+                สร้างการรับรู้ให้แบรนด์<br />(Blog, Video, Infographic)
+              </p>
+            </div>
+            <div class="hidden md:flex items-center text-gray-600">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+            </div>
+            <div
+              class="md:hidden flex items-center text-gray-600 rotate-90 my-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+            </div>
+            <div class="flex flex-col items-center z-10">
+              <div
+                class="bg-gray-800 border-2 border-yellow-500 rounded-full w-24 h-24 flex items-center justify-center mb-3"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-12 w-12 text-yellow-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                  />
+                </svg>
+              </div>
+              <h4 class="font-bold text-lg text-yellow-400">Consideration</h4>
+              <p class="text-sm text-gray-400 max-w-xs">
+                สร้างความน่าเชื่อถือ<br />(Case Study, Webinars)
+              </p>
+            </div>
+            <div class="hidden md:flex items-center text-gray-600">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+            </div>
+            <div
+              class="md:hidden flex items-center text-gray-600 rotate-90 my-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+            </div>
+            <div class="flex flex-col items-center z-10">
+              <div
+                class="bg-gray-800 border-2 border-green-500 rounded-full w-24 h-24 flex items-center justify-center mb-3"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-12 w-12 text-green-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6v-1m0-1V4m0 2.01M12 14c-1.11 0-2.08-.402-2.599-1M12 14v1m0-1v-.01M12 16v1m0 1v1m0-2.01"
+                  />
+                </svg>
+              </div>
+              <h4 class="font-bold text-lg text-green-400">Conversion</h4>
+              <p class="text-sm text-gray-400 max-w-xs">
+                กระตุ้นการตัดสินใจ<br />(Free Demo, Consultant)
+              </p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- Additional Strategic Recommendations Section -->
+      <section>
+        <h2 class="text-2xl font-semibold text-white mb-4">
+          ข้อเสนอแนะแบบเชิงกลยุทธ์เพิ่มเติม
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <article class="card p-6">
+            <h3 class="font-semibold text-lg mb-3 text-white">
+              เน้นใช้ Data Marketing
+            </h3>
+            <ul class="list-disc list-inside text-gray-400 space-y-2">
+              <li>
+                ทำ CRM Segmentation แล้วยิง Retargeting Ads ตามโปรไฟล์ธุรกิจ
+              </li>
+              <li>
+                ทำ Lookalike Audience จากรายชื่อ Partner ที่ประสบความสำเร็จ
+              </li>
+            </ul>
+          </article>
+          <article class="card p-6">
+            <h3 class="font-semibold text-lg mb-3 text-white">
+              ระบบ Referral Partner Program
+            </h3>
+            <ul class="list-disc list-inside text-gray-400 space-y-2">
+              <li>
+                สร้างแรงจูงใจให้ Agent หรือ Operator พาผู้เล่น
+                หรือผู้ร่วมธุรกิจรายอื่นเข้ามาเข้าร่วม
+              </li>
+              <li>จัด Ranking พร้อมรางวัล หรือ Commission เพิ่ม</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="text-center p-4 mt-8 text-gray-500 text-sm no-print">
+      <p>&copy; 2024 B2B Casino Intelligence. All rights reserved.</p>
+    </footer>
+
+    <!-- Modal for AI Response (no-print class added) -->
+    <div
+      id="ai-modal"
+      class="modal-overlay hidden no-print"
+      onclick="closeModal()"
+    >
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="flex justify-between items-center">
+          <h2 id="modal-title">✨ AI-Generated Insights</h2>
+          <button onclick="closeModal()" class="text-gray-400 hover:text-white">
+            &times;
+          </button>
+        </div>
+        <pre id="modal-body">กำลังสร้างสรรค์ไอเดีย...</pre>
+      </div>
+    </div>
+
+    <script>
+      function downloadPDF() {
+        window.print();
+      }
+      async function callGemini(prompt) {
+        let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+        const payload = { contents: chatHistory };
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        try {
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (!response.ok) {
+            throw new Error(`API call failed with status: ${response.status}`);
+          }
+          const result = await response.json();
+          if (
+            result.candidates &&
+            result.candidates.length > 0 &&
+            result.candidates[0].content &&
+            result.candidates[0].content.parts &&
+            result.candidates[0].content.parts.length > 0
+          ) {
+            return result.candidates[0].content.parts[0].text;
+          } else {
+            console.error("Unexpected API response structure:", result);
+            if (result.promptFeedback && result.promptFeedback.blockReason) {
+              return `ไม่สามารถสร้างคำตอบได้เนื่องจาก: ${result.promptFeedback.blockReason}`;
+            }
+            return "ขออภัยค่ะ เกิดข้อผิดพลาดในการรับข้อมูลจาก AI";
+          }
+        } catch (error) {
+          console.error("Error calling Gemini API:", error);
+          return `เกิดข้อผิดพลาด: ${error.message}`;
+        }
+      }
+      const modal = document.getElementById("ai-modal");
+      const modalTitle = document.getElementById("modal-title");
+      const modalBody = document.getElementById("modal-body");
+      function showModal(title) {
+        modalTitle.textContent = title;
+        modalBody.innerHTML =
+          '<div class="animate-pulse">กำลังสร้างสรรค์ไอเดีย...</div>';
+        modal.classList.remove("hidden");
+      }
+      function closeModal() {
+        modal.classList.add("hidden");
+      }
+      function updateModalContent(content) {
+        let formattedContent = content
+          .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
+          .replace(
+            /\* (.*?)(?=\n\* |$)/g,
+            '<li class="ml-4 mb-2"><b>&bull;</b> $1</li>'
+          );
+        modalBody.innerHTML = `<ul style="list-style: none; padding: 0;">${formattedContent}</ul>`;
+      }
+      async function getAIStrategy(button, prompt) {
+        const originalButtonText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = "<span>กำลังคิด...</span>";
+        showModal("✨ AI-Generated Strategies");
+        const result = await callGemini(prompt);
+        updateModalContent(result);
+        button.disabled = false;
+        button.innerHTML = originalButtonText;
+      }
+      async function getAINoteInsights(button, prompt) {
+        const originalButtonText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = "<span>✨...</span>";
+        showModal("✨ AI-Generated Insights");
+        const result = await callGemini(prompt);
+        updateModalContent(result);
+        button.disabled = false;
+        button.innerHTML = originalButtonText;
+      }
+    </script>
+  </body>
+</html>
